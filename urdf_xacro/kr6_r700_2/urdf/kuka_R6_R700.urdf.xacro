@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Xacro principal para el KUKA KR6 R700-2.
+  Adaptado de kroshu/kuka_robot_descriptions (kuka_agilus_support), quitando
+  el bloque de ros2_control real (driver RSI) que no se necesita para
+  simulación/MoveIt Setup Assistant. Solo se conserva la cinemática,
+  geometría visual y de colisión.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kr6_r700_2">
+
+  <xacro:include filename="$(find kuka_R6_R700)/urdf/kr6_r700_2_macro.xacro"/>
+
+  <link name="world"/>
+
+  <xacro:kuka_kr6_r700_2_robot prefix="" package_name="kuka_R6_R700"/>
+
+  <joint name="world-base_link" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <ros2_control name="KR6R700System" type="system">
+    <hardware>
+      <plugin>mock_components/GenericSystem</plugin>
+    </hardware>
+    <joint name="joint_1">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_2">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_3">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_4">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_5">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint_6">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+</robot>
