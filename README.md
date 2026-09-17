@@ -12,11 +12,16 @@ cúbico/quíntico, y verificación del Jacobiano analítico contra MoveIt2/KDL.
 - **`moveit_config/`** — Configuración de MoveIt2: `ompl_planning.yaml`
   (planeadores RRTConnect/RRT*, con `simplify_solutions: true` activado para
   suavizar el camino resultante) y el launch file para scripts con `moveit_py`.
-- **`matlab/`** — Comparación DH propio vs. IK de MoveIt2 (Parte 3), con la
-  conversión de convención de signos/offsets encontrada entre ambos modelos.
-  - **`matlab/parte5/`** — Jacobiano analítico (fórmula geométrica de
-    producto cruz, `Jvi = z_i x (On - Oi)`), con la tabla de verificación de
-    velocidades en los tramos finos.
+- **`matlab/`** — Trabajo en MATLAB, organizado por taller:
+  - **`matlab/Taller1/`** — `taller1_Parcial2.mlx` (live script principal),
+    `IK_try.m` (cinemática inversa simbólica por desacople), `animar_robot.m`
+    (animación 3D de la trayectoria resuelta), y `T_DH.m` (transformación
+    homogénea DH, dependencia común de los dos anteriores).
+  - **`matlab/Taller2/`** — `verificar_jacobiano_4b_4d_matlab.m` (Jacobiano
+    analítico + tabla de verificación de velocidades en los tramos 4B/4D,
+    ya con la indexación y el signo de la junta 4 corregidos), `T_DH.m`,
+    y las trayectorias reales `trayectoria_4b.json` / `trayectoria_4d.json`
+    (mismos archivos que usa el script de Python, para comparación directa).
 - **`python/parte4A/`** — `home → pre-pick`, con evasión de obstáculo.
   - `comparar_planeadores.py`: comparación RRTConnect vs. RRT* (tiempo,
     longitud, suavidad) + ejecución real con el ganador.
