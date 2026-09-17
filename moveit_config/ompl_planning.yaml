@@ -11,6 +11,11 @@ response_adapters:
   - default_planning_response_adapters/DisplayMotionPath
 start_state_max_bounds_error: 0.1
 
+# --- NUEVO: activa la simplificacion del camino geometrico crudo de OMPL ---
+# Sin esto, RRTConnect/RRTstar devuelven el arbol de busqueda tal cual,
+# con giros/zigzags que un paso de suavizado normalmente quita.
+simplify_solutions: true
+
 manipulator:
   planner_configs:
     - RRTConnectkConfigDefault

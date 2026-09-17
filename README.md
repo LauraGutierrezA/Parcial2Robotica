@@ -1,31 +1,70 @@
 # Parcial 2 - Robótica (KUKA KR6 R700-2)
 
-Repositorio del Taller 2: modelado del manipulador, MoveIt2, cinemática inversa
-y planeación de trayectorias con interpolación cúbica/quíntica.
+Repositorio del Taller 2: modelado del manipulador, MoveIt2, cinemática inversa,
+planeación de trayectorias con evasión de obstáculos, perfiles de velocidad
+cúbico/quíntico, y verificación del Jacobiano analítico contra MoveIt2/KDL.
 
 ## Estructura
 
 - **`urdf_xacro/kr6_r700_2/`** — Xacro del robot (adaptado de
   `kroshu/kuka_robot_descriptions`, quitando el driver RSI real) y sus mallas
   de colisión/visuales.
-- **`moveit_config/`** — Archivos de configuración adicionales de MoveIt2:
-  `ompl_planning.yaml` (planeadores RRTConnect/RRT*) y el launch file para
-  correr scripts con `moveit_py`.
-- **`matlab/`** — Scripts de comparación entre el modelo DH propio y la
-  solución de IK de MoveIt2 (Parte 3 del taller), incluyendo la conversión de
-  convención de signos/offsets encontrada entre ambos modelos.
-- **`python/parte4A/`** — Comparación de planeadores OMPL (RRTConnect vs.
-  RRT*) para el tramo `home → pre-pick`, con evasión de obstáculo.
-- **`python/parte4B/`** — Generación de perfiles de movimiento cúbico/quíntico
-  para el acercamiento fino `pre-pick → pick`, con integración real a
-  `computeCartesianPath()` y medición de aceleración articular.
+- **`moveit_config/`** — Configuración de MoveIt2: `ompl_planning.yaml`
+  (planeadores RRTConnect/RRT*, con `simplify_solutions: true` activado para
+  suavizar el camino resultante) y el launch file para scripts con `moveit_py`.
+- **`matlab/`** — Comparación DH propio vs. IK de MoveIt2 (Parte 3), con la
+  conversión de convención de signos/offsets encontrada entre ambos modelos.
+  - **`matlab/parte5/`** — Jacobiano analítico (fórmula geométrica de
+    producto cruz, `Jvi = z_i x (On - Oi)`), con la tabla de verificación de
+    velocidades en los tramos finos.
+- **`python/parte4A/`** — `home → pre-pick`, con evasión de obstáculo.
+  - `comparar_planeadores.py`: comparación RRTConnect vs. RRT* (tiempo,
+    longitud, suavidad) + ejecución real con el ganador.
+  - `demo_4a.py`: versión limpia (sin comparación) para la demo animada
+    fluida del ciclo completo.
+- **`python/parte4B/`** — Acercamiento fino `pre-pick → pick`, perfil quíntico,
+  con `attach` de la pieza y `computeCartesianPath()`.
+  - `perfil_4b.py`: análisis puramente analítico (sin ROS2).
+  - `4b_v2.py`: versión final funcional (agarra la pieza al llegar).
+- **`python/parte4C/`** — `pick → pre-place`, evasión de obstáculo con la
+  pieza ya cargada (RRTConnect).
+- **`python/parte4D/`** — Acercamiento fino `pre-place → place`, perfil
+  quíntico, con búsqueda automática de orientación/semilla de codo para
+  evitar colisión brazo-mesa, y depósito de la pieza al llegar.
+- **`python/parte5/`** — Verificación del Jacobiano: cálculo numérico vía
+  diferencias finitas sobre `/compute_fk` (mismo solver KDL configurado en
+  el taller), comparado contra las velocidades teóricas del perfil elegido
+  en los tramos 4B y 4D.
+- **`python/utilidades/`** — `obtener_angulos.py`: consulta rápida de IK
+  para cualquier posición/orientación (reutilizable).
+- **`ciclo_completo.sh`** — Corre el ciclo completo (4A→4B→4C→4D) en
+  secuencia, para la demostración animada en RViz.
 
-## Notas
+## Flujo de ejecución
 
-- `perfil_4b.py`: análisis puramente analítico (sin ROS2), valida la teoría
-  de los perfiles cúbico/quíntico.
-- `4b_v2.py`: versión final funcional, con `attach` de la pieza y colisiones
-  activas contra mesa/obstáculo.
+```bash
+# Terminal 1
+ros2 launch kuka_R6_R700_moveit_config demo.launch.py
+
+# Terminal 2
+./ciclo_completo.sh
+python3 python/parte5/verificar_jacobiano_4b_4d.py
+```
+
+## Notas técnicas relevantes
+
+- **Convención de signos DH → real** (encontrada en la Parte 3, refinada en
+  la Parte 5): `joint1_real=-θ1_DH`, `joint2_real=θ2_DH`,
+  `joint3_real=θ3_DH+90°`, `joint4_real=-θ4_DH`, `joint5_real=θ5_DH`,
+  `joint6_real=180°-θ6_DH`. El signo de la junta 4 se corrigió tras una
+  verificación cruzada con el Jacobiano numérico — los dos puntos usados
+  originalmente en la Parte 3 (`pick`/`place`) no distinguían el signo de
+  esa junta por casualidad geométrica (uno con la junta en ~0°, el otro
+  en ~180°).
+- **Convención del Jacobiano analítico**: la columna de la junta *i* usa el
+  frame **después** de aplicar la transformación de esa misma junta
+  (`z_i`, `O_i`), no el frame anterior — esta es la convención específica
+  usada en la fórmula de clase (ver `AnalisisVeloc.pdf`), distinta de la
+  convención "textbook" genérica.
 - `4b_prueba_hardcode.py`: script de diagnóstico simplificado que permitió
-  aislar un bug en la versión más compleja del script (documentado en el
-  historial de la conversación de desarrollo).
+  aislar un bug de un intento anterior más complejo del script de 4B.

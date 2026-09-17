@@ -25,7 +25,7 @@ PICK_S = np.array([0.056, 0.098, -0.994])
 
 # --- Pose 'place' (ya validada contra MATLAB en la Parte 3) ---
 PLACE_POSITION = [0.093, -0.588, 0.631]
-PLACE_QUAT_XYZW = [0.648, 0.759, -0.036, 0.042]
+PLACE_QUAT_XYZW = [0.078, -0.995, 0.055, -0.004]  # rotada 270 grados sobre Z local (libre de colision)
 
 D_RETROCESO = 0.1
 
@@ -128,6 +128,11 @@ def main():
         time.sleep(0.5)
 
     # --- Mesa en 'place' ---
+    # Con la orientacion original de 'place' esta posicion generaba colision
+    # real (link_4 vs mesa_place, confirmado con /check_state_validity).
+    # Se roto la orientacion de 'place' 270 grados sobre su propio eje Z
+    # local (ver barrer_orientacion_place.py) -- el vector S se preserva,
+    # asi que la formula original de calcular_mesa vuelve a ser valida.
     mesa_place_pos = calcular_mesa(PLACE_POSITION, MESA_SIZE, ESFERA_RADIO, MESA_BORDE_MARGEN)
     node.get_logger().info(f"Mesa place en {mesa_place_pos}")
     for _ in range(2):
@@ -211,6 +216,8 @@ def main():
     moveit2.wait_until_executed()
     node.get_logger().info("Robot ahora deberia estar fisicamente en pre-pick.")
 
+    executor.shutdown()
+    thread.join(timeout=2.0)
     rclpy.shutdown()
 
 
