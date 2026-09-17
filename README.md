@@ -9,9 +9,16 @@ cúbico/quíntico, y verificación del Jacobiano analítico contra MoveIt2/KDL.
 - **`urdf_xacro/kr6_r700_2/`** — Xacro del robot (adaptado de
   `kroshu/kuka_robot_descriptions`, quitando el driver RSI real) y sus mallas
   de colisión/visuales.
-- **`moveit_config/`** — Configuración de MoveIt2: `ompl_planning.yaml`
-  (planeadores RRTConnect/RRT*, con `simplify_solutions: true` activado para
-  suavizar el camino resultante) y el launch file para scripts con `moveit_py`.
+- **`moveit_config/`** — Paquete de configuración de MoveIt2 completo:
+  - `config/`: `joint_limits.yaml` (límites de aceleración activados a mano),
+    `kr6_r700_2.srdf` (grupos de planeación, poses `home`/`monolito`, matriz
+    de auto-colisión), `kinematics.yaml`, `ompl_planning.yaml`
+    (`simplify_solutions: true` activado), `moveit.rviz` (configuración
+    guardada de RViz), `moveit_controllers.yaml`, `ros2_controllers.yaml`,
+    `pilz_cartesian_limits.yaml`.
+  - `launch/`: todos los launch files generados por el Setup Assistant
+    (`demo.launch.py`, `move_group.launch.py`, etc.), más
+    `kr6_moveit_py.launch.py` para los scripts con `moveit_py`.
 - **`matlab/`** — Trabajo en MATLAB, organizado por taller:
   - **`matlab/Taller1/`** — `taller1_Parcial2.mlx` (live script principal),
     `IK_try.m` (cinemática inversa simbólica por desacople), `animar_robot.m`
@@ -42,6 +49,12 @@ cúbico/quíntico, y verificación del Jacobiano analítico contra MoveIt2/KDL.
   en los tramos 4B y 4D.
 - **`python/utilidades/`** — `obtener_angulos.py`: consulta rápida de IK
   para cualquier posición/orientación (reutilizable).
+- **`python/diagnosticos/`** — Scripts de depuración usados durante el
+  proceso de desarrollo (NO forman parte del pipeline final, se conservan
+  como evidencia del proceso): pruebas de reposicionamiento de mesas,
+  barridos de orientación, verificación de repetibilidad del IK, y
+  versiones intermedias de 4D antes de llegar a la solución final. Ver el
+  mensaje del commit correspondiente para más contexto.
 - **`ciclo_completo.sh`** — Corre el ciclo completo (4A→4B→4C→4D) en
   secuencia, para la demostración animada en RViz.
 
